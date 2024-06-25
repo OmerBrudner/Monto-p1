@@ -26,7 +26,33 @@ const start = async () => {
 
 };
 
-// // decleration of a rout that throw an error
+
+  
+    // Declaration of a route that returns a simple "Hello" message
+
+//   const helloQuerySchema = {
+//     type: 'object',
+//     properties: {
+//       name: { type: 'string' }
+//     },
+//     required: []
+//   };
+
+//   fastify.get<{ Querystring: { name?: string } }>('/hello', {
+//     schema: {
+//       querystring: helloQuerySchema
+//     }
+//   }, async (request: FastifyRequest<{ Querystring: { name?: string } }>, reply: FastifyReply) => {
+//     try {
+//       const { name } = request.query;
+//       return { message: `Hello ${name || 'World'}` };
+//     } catch (error) {
+//       Sentry.captureException(error);
+//       reply.code(500).send({ error: 'An error occurred' });
+//     }
+//   });
+
+    // decleration of a rout that throw an error
 // fastify.get('/error', async (request, reply) => {
 //     try {
 //         throw new Error('error!!!')
