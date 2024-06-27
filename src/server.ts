@@ -3,18 +3,15 @@ import { initSentry } from './utils/sentry.ts';
 import invoivceRoutes from './routes/invoiceRoutes.ts';
 import * as Sentry from '@sentry/node';
 import { connect } from './utils/mongoConnect.ts';
-import { createInvoicesSchema } from './controllers/invoiceController.ts';
 
 initSentry();
 
 const fastify: FastifyInstance = Fastify({ logger: true });
-
-// fastify.addSchema(createInvoicesSchema);
-
 fastify.register(invoivceRoutes);
 
 const start = async () => {
     try {
+        const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
         await fastify.listen({ port: 3000 });
         connect();
         fastify.log.info(`Server is running on port 3000`);
@@ -26,6 +23,7 @@ const start = async () => {
 
 };
 
+<<<<<<< HEAD
 
   
     // Declaration of a route that returns a simple "Hello" message
@@ -65,3 +63,7 @@ fastify.get('/error', async (request, reply) => {
 // run the server
 
 start();
+=======
+// run the server
+start();
+>>>>>>> 4ef9128 (changes)

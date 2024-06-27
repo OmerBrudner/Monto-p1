@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/index.ts'",
-    "ser": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/server.ts'",
-    "con": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/connect.ts'"
+    "dev": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/index.ts",
+    "ser": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/server.ts"
   },
   "keywords": [],
   "author": "",
