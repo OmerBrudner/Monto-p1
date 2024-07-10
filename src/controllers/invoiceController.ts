@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { getDB } from '../utils/mongoConnect.ts';
 import { MontoInvoice, MontoInvoiceQuery } from '../models/invoiceModel.ts';
 import * as Sentry from '@sentry/node';
+import { ObjectId } from 'mongodb';
 
 
 // Rout handlet to say hello
@@ -27,8 +28,28 @@ export const createInvoice = async (req: FastifyRequest<{ Body: MontoInvoice }>,
         const result = await invoicesCollection.insertOne(invoice);
         reply.status(201).send({ message: 'Invoice created', id: result.insertedId });
     } catch (error) {
+        Sentry.captureException(error);
         console.error('Error while creating invoice', error);
         reply.status(500).send({ message: 'Error while creating invoice' });
+    }
+};
+
+// Route handler to create invoices with array using a for loop
+export const createInvoices = async (req: FastifyRequest<{ Body: MontoInvoice[] }>, reply: FastifyReply) => {
+    try {
+        const db = await getDB();
+        const invoicesCollection = db.collection<MontoInvoice>('Invoices');
+
+        const invoices: MontoInvoice[] = req.body as MontoInvoice[];
+
+        for (const invoice of invoices) {
+            await invoicesCollection.insertOne(invoice);
+        }
+        reply.status(201).send({ message: 'Invoices created' });
+    } catch (error) {
+        Sentry.captureException(error);
+        console.error('Error while creating invoices', error);
+        reply.status(500).send({ message: 'Error while creating invoices' });
     }
 };
 
@@ -78,10 +99,6 @@ export const getInvoices = async (req: FastifyRequest<{ Querystring: MontoInvoic
             filters.total = queryParams.total;
         }
 
-
-        console.log('Filters:', filters);
-
-
         const db = await getDB();
         const invoicesCollection = db.collection<MontoInvoice>('Invoices');
         const invoices = await invoicesCollection.find(filters).toArray();
@@ -93,4 +110,46 @@ export const getInvoices = async (req: FastifyRequest<{ Querystring: MontoInvoic
     }
 };
 
+// Route handler to update an invoice
+export const updateInvoice = async (req: FastifyRequest<{ Body: MontoInvoice }>, reply: FastifyReply) => {
+    try {
+        const db = await getDB();
+        const invoicesCollection = db.collection<MontoInvoice>('Invoices');
+        const invoice: MontoInvoice = req.body as MontoInvoice;
+        const { id, ...updateFields } = invoice; // Destructuring the id and updateFields from the Invoice
+        const result = await invoicesCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: updateFields } // setting the updateFields
+        );
+        if (result.matchedCount === 0) {
+            reply.status(404).send({ message: 'Invoice not found' });
+            return;
+        }
+        reply.status(200).send({ message: 'Invoice updated', id: id });
+    } catch (error) {
+        Sentry.captureException(error);
+        console.error('Error while updating invoice', error);
+        reply.status(500).send({ message: 'Error while updating invoice' });
+    }
+}
 
+//Route handler to delete an invoice
+export const deleteInvoice = async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+    try {
+        const db = await getDB();
+        const invoicesCollection = db.collection<MontoInvoice>('Invoices');
+        const { id } = req.params;
+
+        const result = await invoicesCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            reply.status(404).send({ message: 'Invoice not found' });
+            return;
+        }
+        reply.status(200).send({ message: 'Invoice deleted', id: id });
+    } catch (error) {
+        Sentry.captureException(error);
+        console.error('Error while deleting invoice', error);
+        reply.status(500).send({ message: 'Error while deleting invoice' });
+    }
+}

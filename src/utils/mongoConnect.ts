@@ -15,6 +15,8 @@ export async function getDB(): Promise<Db> {
       const client = new MongoClient(uri);
       await client.connect();
       db = client.db(dbName);
+      console.log('Connected to MongoDB!');
+
     } catch (error) {
       console.error('Error while connecting to MongoDB', error);
     }
