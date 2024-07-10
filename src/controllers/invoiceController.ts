@@ -17,7 +17,7 @@ export const sayHello = async (req: FastifyRequest<{ Querystring: { name?: strin
     }
 }
 
-// Route handler to create an invoice without array
+// Route handler to create an invoice
 export const createInvoice = async (req: FastifyRequest<{ Body: MontoInvoice }>, reply: FastifyReply) => {
     try {
         const db = await getDB();
@@ -34,7 +34,7 @@ export const createInvoice = async (req: FastifyRequest<{ Body: MontoInvoice }>,
     }
 };
 
-// Route handler to create invoices with array using a for loop
+// Route handler to create invoices
 export const createInvoices = async (req: FastifyRequest<{ Body: MontoInvoice[] }>, reply: FastifyReply) => {
     try {
         const db = await getDB();
