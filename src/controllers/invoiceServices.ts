@@ -33,6 +33,7 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
             invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime() &&
             invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
     }
+
     // if (filters?.invoice_date_start) {
     //     filteredInvoices = filteredInvoices.filter(invoice => invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime())
     // }
