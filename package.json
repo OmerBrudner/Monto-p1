@@ -24,6 +24,7 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.28.0",
     "mongodb": "^6.7.0",
+    "puppeteer": "^22.13.0",
     "sentry": "^0.1.2",
     "tsconfig-paths": "^4.2.0"
   }
