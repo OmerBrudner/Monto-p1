@@ -1,9 +1,13 @@
 
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { getDB } from '../utils/mongoConnect.ts';
-import { MontoInvoice, MontoInvoiceQuery } from '../models/invoiceModel.ts';
+import { MontoInvoice, MontoInvoiceQuery, InvoiceFilters } from '../models/models.ts';
 import * as Sentry from '@sentry/node';
 import { ObjectId } from 'mongodb';
+import { getAuthToken } from './authentication.ts';
+import { scrapeInvoices } from './invoiceServices.ts';
+import { cacheGet, cacheSet } from 'src/utils/cache.ts';
+
 
 
 // Rout handlet to say hello
@@ -115,17 +119,20 @@ export const updateInvoice = async (req: FastifyRequest<{ Body: MontoInvoice }>,
     try {
         const db = await getDB();
         const invoicesCollection = db.collection<MontoInvoice>('Invoices');
+
         const invoice: MontoInvoice = req.body as MontoInvoice;
         const { id, ...updateFields } = invoice; // Destructuring the id and updateFields from the Invoice
+
         const result = await invoicesCollection.updateOne(
             { _id: new ObjectId(id) },
-            { $set: updateFields } // setting the updateFields
+            { $set: updateFields }, // setting the updateFields
+            { upsert: true }
         );
-        if (result.matchedCount === 0) {
-            reply.status(404).send({ message: 'Invoice not found' });
-            return;
+        if (result.upsertedCount > 0) {
+            reply.status(201).send({ message: 'Invoice not found new invoice created', id: result.upsertedId });
+        } else {
+            reply.status(200).send({ message: 'Invoice updated', id: id })
         }
-        reply.status(200).send({ message: 'Invoice updated', id: id });
     } catch (error) {
         Sentry.captureException(error);
         console.error('Error while updating invoice', error);
@@ -153,3 +160,46 @@ export const deleteInvoice = async (req: FastifyRequest<{ Params: { id: string }
         reply.status(500).send({ message: 'Error while deleting invoice' });
     }
 }
+
+// Route handler to scrape invoices
+export const getScrapedInvoices = async (req: FastifyRequest<{ Querystring: InvoiceFilters }>, reply: FastifyReply) => {
+    try {
+        const filters: InvoiceFilters = req.query;
+
+        // generate a cache key
+        const cacheKey = `scrapedInvoices:${JSON.stringify(filters)}`;
+        const cachedData = await cacheGet(cacheKey);
+        if (cachedData) {
+            return reply.status(200).send(cachedData);
+        }
+
+        // get the authentication token
+        const authToken = await getAuthToken({
+            rootUrl: process.env.MONTO_URL!,
+            userName: process.env.MONTO_USERNAME!,
+            password: process.env.MONTO_PASSWORD!
+        });
+
+        // scrape invoices from service
+        const scrapedInvoices = await scrapeInvoices(authToken, filters);
+
+        // save the invoices to the database
+        const db = await getDB();
+        const invoicesCollection = db.collection<MontoInvoice>('Invoices');
+        for (const invoice of scrapedInvoices) {
+            const invoiceId = new ObjectId(invoice.id); // conver id to objectId of mongodb
+            await invoicesCollection.updateOne(
+                { _id: invoiceId },
+                { $set: invoice },
+                { upsert: true }
+            );
+        }
+        await cacheSet(cacheKey, scrapedInvoices, 5 * 60 * 1000); // Cache for 5 minutes
+
+        reply.status(200).send(scrapedInvoices);
+    } catch (error) {
+        Sentry.captureException(error);
+        console.error('Error while scraping invoices', error);
+        reply.status(500).send({ message: 'Error while scraping invoices' });
+    }
+};

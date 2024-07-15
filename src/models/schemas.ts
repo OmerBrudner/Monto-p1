@@ -190,3 +190,23 @@ export const deleteSchema = {
         required: ['id'],
     }
 };
+
+export const scrapeSchema = {
+    querystring: {
+        type: 'object',
+        properties: {
+            portal_name: {
+                type: 'string',
+                maxLength: 100
+            },
+            status: {
+                type: 'string',
+                enum: ['Approved', 'Pending Approval', 'Paid', 'Rejected', 'Canceled'],
+            },
+            /*invoice_date*/
+            invoice_date_start: { type: 'string', format: 'date-time' },
+            invoice_date_end: { type: 'string', format: 'date-time' },
+
+        },
+    }
+}
