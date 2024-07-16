@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/node';
 import { ObjectId } from 'mongodb';
 import { getAuthToken } from './authentication.ts';
 import { scrapeInvoices } from './invoiceServices.ts';
-import { cacheGet, cacheSet } from 'src/utils/cache.ts';
+import { cacheGet, cacheSet } from '../utils/cache.ts';
 
 
 
@@ -190,10 +190,11 @@ export const getScrapedInvoices = async (req: FastifyRequest<{ Querystring: Invo
             const invoiceId = new ObjectId(invoice.id); // conver id to objectId of mongodb
             await invoicesCollection.updateOne(
                 { _id: invoiceId },
-                { $set: invoice },
+                { $set: { ...invoice, _id: invoiceId } },
                 { upsert: true }
             );
         }
+
         await cacheSet(cacheKey, scrapedInvoices, 5 * 60 * 1000); // Cache for 5 minutes
 
         reply.status(200).send(scrapedInvoices);

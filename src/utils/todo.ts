@@ -13,5 +13,5 @@
 /*project 2*/
 // made 'id, currency and total' as optional on the montoinvoice model because i dont see them in the monto invoice backoffice
 // schema is only with date start and date end, not specific date, check it
-``
+
 // - Learn the query language of MongoDB

@@ -25,15 +25,28 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
     }
 
     const invoices: MontoInvoice[] = await response.json();
-
+    // Convert string dates to Date objects
+    const convertedInvoices = invoices.map(invoice => ({
+        ...invoice,
+        invoice_date: new Date(invoice.invoice_date),
+    }));
     // apply filters
-    let filteredInvoices = invoices;
+    let filteredInvoices = convertedInvoices;
+    // if (filters?.invoice_date_start && filters?.invoice_date_end) {
+    //     filteredInvoices = filteredInvoices.filter(invoice =>
+    //         invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime() &&
+    //         invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
+    // }
     if (filters?.invoice_date_start && filters?.invoice_date_end) {
-        filteredInvoices = filteredInvoices.filter(invoice =>
-            invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime() &&
-            invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
-    }
+        const startDate = new Date(filters.invoice_date_start);
+        const endDate = new Date(filters.invoice_date_end);
 
+        filteredInvoices = filteredInvoices.filter(invoice =>
+            invoice.invoice_date.getTime() >= startDate.getTime() &&
+            invoice.invoice_date.getTime() <= endDate.getTime()
+        );
+    }
+    /*IF THE ABOVE NOT WORKING*/
     // if (filters?.invoice_date_start) {
     //     filteredInvoices = filteredInvoices.filter(invoice => invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime())
     // }

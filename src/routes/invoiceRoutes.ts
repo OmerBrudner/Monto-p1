@@ -10,7 +10,7 @@ async function routes(fastify: FastifyInstance) {
     fastify.post('/invoices', { schema: arraySchema }, createInvoices);
     fastify.put('/invoices/:id', { schema: updateSchema }, updateInvoice);
     fastify.delete('/invoices/:id', { schema: deleteSchema }, deleteInvoice);
-    fastify.get('/invoces/scrape', { schema: scrapeSchema }, getScrapedInvoices);
+    fastify.get('/invoices/scrape', { schema: scrapeSchema }, getScrapedInvoices);
 }
 
 export default routes;

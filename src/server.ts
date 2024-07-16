@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import { initSentry } from './utils/sentry.ts';
 import invoivceRoutes from './routes/invoiceRoutes.ts';
 import * as Sentry from '@sentry/node';
@@ -12,8 +12,8 @@ fastify.register(invoivceRoutes);
 const start = async () => {
     try {
         await getDB();
-        const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-        await fastify.listen({ port: 3000 });
+        const port = process.env.PORT ? parseInt(process.env.PORT!, 10) : 3000;
+        await fastify.listen({ port });
         fastify.log.info(`Server is running on port 3000`);
     } catch (err) {
         Sentry.captureException(err);
