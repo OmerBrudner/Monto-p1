@@ -3,9 +3,10 @@ import { MontoCredential, MontoAuthentication } from "src/models/models.ts";
 import { cacheGet, cacheSet } from "../utils/cache.ts";
 import * as Sentry from '@sentry/node';
 
+// @TODO use unique cache keys & hash
 export async function getAuthToken(credential: MontoCredential): Promise<MontoAuthentication> {
     // check if the token is already in the cache
-    const cachedAuthdata = await cacheGet('authToken');
+    const cachedAuthdata = cacheGet('authToken');
 
     if (cachedAuthdata) {
         return cachedAuthdata;
