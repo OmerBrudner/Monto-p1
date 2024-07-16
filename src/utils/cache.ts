@@ -2,23 +2,25 @@ import { CacheData } from "src/models/models.ts";
 
 const cacheStore: { [key: string]: CacheData } = {};
 
-export async function cacheGet(key: string): Promise<any> {
-    const cachData = cacheStore[key];
+export function cacheGet(key: string): any | null {
+    const cacheData = cacheStore[key];
 
-    if (!cachData) {
+    if (!cacheData) {
         return null;
     }
 
     const now = new Date().getTime();
-    if (now > cachData.expiration) {
+    if (now > cacheData.expiration) {
         delete cacheStore[key];
         return null;
     }
 
-    return cachData.data;
+    return cacheData.data;
 }
 
-export async function cacheSet(key: string, data: any, ttl: number): Promise<any | null> {
+export function cacheSet(key: string, data: any, ttl: number = 1000 * 60 * 10): any {
     const expiration = new Date().getTime() + ttl;
     cacheStore[key] = { data, expiration };
+
+    return { data, expiration };
 }
