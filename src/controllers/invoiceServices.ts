@@ -38,7 +38,7 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
     //         invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
     // }
     if (filters?.invoice_date_start && filters?.invoice_date_end) {
-        const startDate = new Date(filters.invoice_date_start);
+        const startDate = new Date(filters.invoice_date_start); // convertion to date object for the comparison
         const endDate = new Date(filters.invoice_date_end);
 
         filteredInvoices = filteredInvoices.filter(invoice =>

@@ -187,11 +187,11 @@ export const getScrapedInvoices = async (req: FastifyRequest<{ Querystring: Invo
         const db = await getDB();
         const invoicesCollection = db.collection<MontoInvoice>('Invoices');
         for (const invoice of scrapedInvoices) {
-            const invoiceId = new ObjectId(invoice.id); // conver id to objectId of mongodb
+            const invoiceId = new ObjectId(invoice.id); // converts id to objectId of mongodb
             await invoicesCollection.updateOne(
-                { _id: invoiceId },
-                { $set: { ...invoice, _id: invoiceId } },
-                { upsert: true }
+                { _id: invoiceId }, // 
+                { $set: { ...invoice, _id: invoiceId } }, // spreads all fields of invoice while explicitly setting _id to invoiceId
+                { upsert: true } // ensures that if the invoice does not exist, it will be created
             );
         }
 

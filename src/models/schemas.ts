@@ -204,8 +204,8 @@ export const scrapeSchema = {
                 enum: ['Approved', 'Pending Approval', 'Paid', 'Rejected', 'Canceled'],
             },
             /*invoice_date*/
-            invoice_date_start: { type: 'string', format: 'date-time' },
-            invoice_date_end: { type: 'string', format: 'date-time' },
+            invoice_date_start: { type: 'string', format: 'date' }, // if im using date-time, i have to specify the time on the get request
+            invoice_date_end: { type: 'string', format: 'date' },
 
         },
     }

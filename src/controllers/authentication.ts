@@ -39,7 +39,7 @@ export async function getAuthToken(credential: MontoCredential): Promise<MontoAu
         const authToken = authTokenCookie.value;
         const ttl = 5 * 60 * 1000;
         const now = new Date().getTime();
-        console.log('expiration:', authTokenCookie.expires); // check if the expiration is in miliseconds כדי לראות שאפשר להשוות אחרי זה לטיטיאל
+        console.log('expiration:', authTokenCookie.expires); // check if the expiration is in miliseconds 
         const expiration = Math.min(authTokenCookie.expires * 1000, now + ttl);
 
         // Cache the token
