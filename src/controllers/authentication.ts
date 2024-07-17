@@ -2,16 +2,20 @@ import puppeteer from "puppeteer";
 import { MontoCredential, MontoAuthentication } from "src/models/models.ts";
 import { cacheGet, cacheSet } from "../utils/cache.ts";
 import * as Sentry from '@sentry/node';
+import { createHash } from "crypto";
 
-// @TODO use unique cache keys & hash
+function generateHashKey(credential: MontoCredential): string {
+    const hash = createHash('sha256');
+    hash.update(`${credential.rootUrl}:${credential.userName}:${credential.password}`);
+    return hash.digest('hex'); // Finalize the hash computation and get the result as a hexadecimal string
+}
 export async function getAuthToken(credential: MontoCredential): Promise<MontoAuthentication> {
+    const uniqueCacheKey = generateHashKey(credential);
+    const cachedAuthdata = cacheGet(uniqueCacheKey);
     // check if the token is already in the cache
-    const cachedAuthdata = cacheGet('authToken');
-
     if (cachedAuthdata) {
         return cachedAuthdata;
     }
-
     // If no cached data, perform the authentication process using Puppeteer
     const { rootUrl, userName, password } = credential;
     const browser = await puppeteer.launch({ headless: true });
@@ -40,11 +44,10 @@ export async function getAuthToken(credential: MontoCredential): Promise<MontoAu
         const authToken = authTokenCookie.value;
         const ttl = 5 * 60 * 1000;
         const now = new Date().getTime();
-        console.log('expiration:', authTokenCookie.expires); // check if the expiration is in miliseconds 
         const expiration = Math.min(authTokenCookie.expires * 1000, now + ttl);
 
         // Cache the token
-        await cacheSet('authToken', { token: authToken, expiration }, expiration - now);
+        await cacheSet(uniqueCacheKey, { token: authToken, expiration }, expiration - now);
 
         return { authToken, expiration };
     } catch (error) {

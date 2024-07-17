@@ -21,6 +21,7 @@
   "dependencies": {
     "@sentry/node": "^8.10.0",
     "@sentry/profiling-node": "^8.10.0",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.0",
     "mongodb": "^6.7.0",

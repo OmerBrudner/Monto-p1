@@ -4,7 +4,8 @@ export const helloQuerySchema = {
         properties: {
             name: {
                 type: 'string',
-                maxLength: 100
+                maxLength: 100,
+                default: 'World'
             }
         },
         required: [],
@@ -203,8 +204,7 @@ export const scrapeSchema = {
                 type: 'string',
                 enum: ['Approved', 'Pending Approval', 'Paid', 'Rejected', 'Canceled'],
             },
-            /*invoice_date*/
-            invoice_date_start: { type: 'string', format: 'date' }, // if im using date-time, i have to specify the time on the get request
+            invoice_date_start: { type: 'string', format: 'date' },
             invoice_date_end: { type: 'string', format: 'date' },
 
         },

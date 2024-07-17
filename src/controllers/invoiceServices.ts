@@ -9,8 +9,8 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
         Sentry.captureException(new Error('Authentication expired'));
         throw new Error('Authentication expired');
     }
-
-    const response = await fetch(process.env.API_URL!, {
+    const urlApi = `https://backoffice.dev.montopay.com/${process.env.API_URL!}`;
+    const response = await fetch(urlApi, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -32,13 +32,9 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
     }));
     // apply filters
     let filteredInvoices = convertedInvoices;
-    // if (filters?.invoice_date_start && filters?.invoice_date_end) {
-    //     filteredInvoices = filteredInvoices.filter(invoice =>
-    //         invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime() &&
-    //         invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
-    // }
     if (filters?.invoice_date_start && filters?.invoice_date_end) {
-        const startDate = new Date(filters.invoice_date_start); // convertion to date object for the comparison
+        // convertion to date object for the comparison
+        const startDate = new Date(filters.invoice_date_start);
         const endDate = new Date(filters.invoice_date_end);
 
         filteredInvoices = filteredInvoices.filter(invoice =>
@@ -46,13 +42,6 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
             invoice.invoice_date.getTime() <= endDate.getTime()
         );
     }
-    /*IF THE ABOVE NOT WORKING*/
-    // if (filters?.invoice_date_start) {
-    //     filteredInvoices = filteredInvoices.filter(invoice => invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime())
-    // }
-    // if (filters?.invoice_date_end) {
-    //     filteredInvoices = filteredInvoices.filter(invoice => invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
-    // }
     if (filters?.portal_name) {
         filteredInvoices = filteredInvoices.filter(invoice => invoice.portal_name === filters.portal_name)
     }
@@ -63,60 +52,3 @@ export async function scrapeInvoices(authentication: MontoAuthentication, filter
 
 }
 
-/*PUPETEER CODE*/
-/*
-const browser = await puppeteer.launch({ headless: true });
-const page = await browser.newPage();
-
-try {
-    // setting the auth token
-    await page.setCookie({ name: 'appSession', value: authToken, domain: 'backoffice.dev.montopay.com' });
-    await page.goto('https://backoffice.dev.montopay.com/');
-
-    // extract the invoices data
-    const invoices = await page.evaluate(() => {
-        const rows = Array.from(document.querySelectorAll('table > tbody > tr'));
-        const invoicesData = rows.map(row => {
-            const cells = row.querySelectorAll('td');
-            return {
-                //id: cells[0].textContent?.trim() || '', - no column in the monto invoice backoffice
-                portal_name: cells[5].textContent?.trim() || '',
-                invoice_number: cells[2].textContent?.trim() || '',
-                //po_number: cells[3].textContent?.trim() || '', - no cloumn in the monto invoice backoffice
-                buyer: cells[1].textContent?.trim() || '',
-                status: cells[6].textContent?.trim() as MontoInvoiceStatus || 'Pending', // default status if there's no status
-                invoice_date: new Date(cells[4].textContent?.trim() || ''),
-                // currency: cells[7].textContent?.trim() || '', - no column in the monto invoice backoffice
-                // total: parseFloat(cells[8].textContent?.replace(/[^0-9.-]+/g, '').trim() || '0'),
-            };
-        });
-        return invoicesData;
-    });
-
-    let filteredInvoices = invoices;
-    if (filters?.invoice_date_start) {
-        filteredInvoices = filteredInvoices.filter(invoice => invoice.invoice_date.getTime() >= filters.invoice_date_start!.getTime())
-    }
-    if (filters?.invoice_date_end) {
-        filteredInvoices = filteredInvoices.filter(invoice => invoice.invoice_date.getTime() <= filters.invoice_date_end!.getTime())
-    }
-    if (filters?.portal_name) {
-        filteredInvoices = filteredInvoices.filter(invoice => invoice.portal_name === filters.portal_name)
-    }
-    if (filters?.status) {
-        filteredInvoices = filteredInvoices.filter(invoice => invoice.status === filters.status)
-    }
-
-    // ensure date type
-    return filteredInvoices.map(invoice => ({
-        ...invoice,
-        invoice_date: new Date(invoice.invoice_date)
-    }));
-
-} catch (error) {
-    Sentry.captureException(error);
-    throw new Error('Error while getting invoices');
-} finally {
-    await browser.close();
-}
-    */

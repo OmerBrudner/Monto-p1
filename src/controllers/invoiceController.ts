@@ -14,7 +14,7 @@ import { cacheGet, cacheSet } from '../utils/cache.ts';
 export const sayHello = async (req: FastifyRequest<{ Querystring: { name?: string } }>, reply: FastifyReply) => {
     try {
         const { name } = req.query;
-        return { message: `Hello ${name || 'World'}` };
+        return { message: `Hello ${name}` }; ``
     } catch (error) {
         Sentry.captureException(error);
         reply.code(500).send({ error: 'An error occurred' });

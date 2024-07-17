@@ -1,13 +1,13 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import { initSentry } from './utils/sentry.ts';
-import invoivceRoutes from './routes/invoiceRoutes.ts';
+import invoiceRoutes from './routes/invoiceRoutes.ts';
 import * as Sentry from '@sentry/node';
 import { getDB } from './utils/mongoConnect.ts';
 
 initSentry();
 
 const fastify: FastifyInstance = Fastify({ logger: true });
-fastify.register(invoivceRoutes);
+fastify.register(invoiceRoutes);
 
 const start = async () => {
     try {
@@ -24,6 +24,5 @@ const start = async () => {
 
 (async () => {
     await start();
-}
-)();
+})();
 
