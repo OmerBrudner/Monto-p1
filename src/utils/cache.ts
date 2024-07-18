@@ -18,7 +18,6 @@ export function cacheGet(key: string): any | null {
     return cacheData.data;
 }
 
-
 export function cacheSet(key: string, data: any, ttl: number = 1000 * 60 * 10): any { // default ttl is 10 minutes
 
     const expiration = new Date().getTime() + ttl;

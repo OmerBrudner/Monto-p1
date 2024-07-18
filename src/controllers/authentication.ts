@@ -11,10 +11,10 @@ function generateHashKey(credential: MontoCredential): string {
 }
 export async function getAuthToken(credential: MontoCredential): Promise<MontoAuthentication> {
     const uniqueCacheKey = generateHashKey(credential);
-    const cachedAuthdata = cacheGet(uniqueCacheKey);
+    const cachedAuthData = cacheGet(uniqueCacheKey);
     // check if the token is already in the cache
-    if (cachedAuthdata) {
-        return cachedAuthdata;
+    if (cachedAuthData) {
+        return cachedAuthData;
     }
     // If no cached data, perform the authentication process using Puppeteer
     const { rootUrl, userName, password } = credential;

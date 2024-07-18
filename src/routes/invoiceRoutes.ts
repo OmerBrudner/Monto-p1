@@ -12,5 +12,5 @@ async function routes(fastify: FastifyInstance) {
     fastify.delete('/invoices/:id', { schema: deleteSchema }, deleteInvoice);
     fastify.get('/invoices/scrape', { schema: scrapeSchema }, getScrapedInvoices);
 }
-
+``
 export default routes;
